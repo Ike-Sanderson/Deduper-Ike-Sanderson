@@ -18,12 +18,15 @@ import re
 
 RNAMEdict = {}
 
-'''Function'''
-#position_correct function
-def position_correct(initial_POS: int) -> int:
 
-    '''this function will iterate through reads and fix all starting left (5') positions, 
-        accounting for soft clip where needed. Write all lines (including any corrected POS) to a temp SAM file'''
+#Position_correct 
+
+'''I started out trying to write this as a high level function but kept coming back to just wanting to have this set of code run 
+to completion and then run the next set. I dont ask the code to manipulate and then return values, 
+rather I ask it to rewrite the file. It seems safer than rewriting the original SAM.
+
+    This block will iterate through input SAM reads and fix all starting left (5') positions, 
+    accounting for soft clip where needed. Write all lines (including any corrected POS) to a temp SAM file (so I don't corrupt original)'''
 
 #open input SAM file as read, open tempSAM file as write
     #for loop iterates through
@@ -32,29 +35,26 @@ def position_correct(initial_POS: int) -> int:
                 #if forward strand, i.e. if((flag&16) != 16)
                     #if soft clip, extract countback from cigar, adjust POS
                     #if re.match('$6~/^(([1-9]|[1-9][0-9])[S]$/', readline) <- maybe this will work?
+                                                        ## (starts w any single or dble digit number followed by S)
                         #countback = the same regex used above
                         #true_leftPOS = readline[$4] + countback
                         #write readline with true_leftPOS into tempSAM file
 
                 #else, i.e. if((flag&16) == 16) --> strand is revcomp
                     #if soft clip, extract countback from cigar, adjust POS
-                    #if re.match('$6~/^(([1-9]|[1-9][0-9])[S]$/', readline) <- maybe this will work?
+                    #if re.match('$6~/^(([1-9]|[1-9][0-9])[S]$/', readline) <- maybe this will work? 
                         #countback = the same regex used above
                         #true_leftPOS = readline[$4] - countback
                         #write readline with true_leftPOS into tempSAM file
             #else:
                 #write readline to tempSAM file
     #close input SAM file, close tempSAM file    
-    
 
-'''Main'''
+#Write output SAM file
 
 '''iterate through temp SAM file and build dictionary of RNAME=key: POS = value
- for each dict entry, write line to new SAM file
- as build dict, check to see if key:value already exists, if so => do not write'''
-
-
-#call position_correct function
+for each dict entry, write line to new SAM file
+as build dict, check to see if key:value already exists, if so => do not write'''
 
 #open tempSAM file as read, open output SAM file as write
     #for loop line in tempSAM file
@@ -73,7 +73,6 @@ def position_correct(initial_POS: int) -> int:
                     #RNAMEdict[RNAME] = [readline[$4]]  assign POS as 1st value for RNAME key, add QNAME (from $1) to 2nd value
                     #write readline to output SAM file
     #close input and output SAM files
-
 
 
 
